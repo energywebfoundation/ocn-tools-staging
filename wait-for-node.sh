@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-until $(curl --output /dev/null --silent --head --fail http://localhost:8080/health); do
+until $(curl --output /dev/null --silent --head --fail https://test-ocn.emobilify.com/health); do
     printf 'waiting for node up\n'
     sleep 5
 done
