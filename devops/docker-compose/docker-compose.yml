@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    restart: always
+    volumes:
+      - "./nginx:/etc/nginx/conf.d:rw"
+    ports:
+      - "80:80"
+      - "443:443"
+      
+  cpo:
+    build:
+      context: ./ocn-tools-staging
+      dockerfile: Dockerfile
+    image: "${AWS_ACCOUNT_ID_STAGING}:${TAG}"
+    container_name: cpo_simulation
+    restart: always
+    ports:
+      - 3000:3000
+    volumes:
+      - "./cpo.db:/home/node/app/cpo.db:rw"
+    environment:
+      OCN_IDENTITY: "${CPO_PRIVATE_KEY}"
+      OCN_TOKEN_A: "${CPO_TOKEN_A}"
+    command: ["./wait-for-node.sh", "--cpo"]

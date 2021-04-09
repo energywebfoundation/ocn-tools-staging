@@ -3,11 +3,10 @@ name: Docker Image CI
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
     
 env:
   ECR_REPOSITORY: ew-elia
+  AWS_REPOSITORY_URL: "${{ secrets.AWS_ACCOUNT_ID_STAGING }}..dkr.ecr.eu-central-1.amazonaws.com/$ECR_REPOSITORY"
 
 jobs:
   
@@ -53,4 +52,44 @@ jobs:
     - name: Logout of Amazon ECR
       if: always()
       run: docker logout ${{ steps.login-ecr.outputs.registry }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deploy to elia_staging
+      uses: peterkimzz/aws-ssm-send-command@master
+      id: ssm
+      with:
+        aws-region: eu-central-1
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        instance-ids: ${{ secrets.INSTANCE_ID }}
+
+        working-directory: /home/ubuntu/docker-stack/
+        command: ls -la
+        command: echo $USER
+        
+        #Setup aws Credentials/Variables
+        command: export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+        command: export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        command: export AWS_DEFAULT_REGION=eu-central-1
+        command: export TAG=$IMAGE_TAG
+        command: export CPO_PRIVATE_KEY=${{ secrets.CPO_PRIVATE_KEY }}
+        command: export CPO_TOKEN_A=${{ secrets.CPO_TOKEN_A }}
+        command: export AWS_REPOSITORY_URL=$AWS_REPOSITORY_URL
+
+        #login to docker (AWS)
+        command: aws ecr get-login --no-include-email --region eu-central-1 | bash
+
+        #create nginx certificates and key
+        command: echo ${{ secrets.NGINX_CERTIFICATE }} > ./${{ github.event.repository.name }}/devops/nginx/origin.crt
+        command: echo ${{ secrets.NGINX_KEY }} > ./${{ github.event.repository.name }}/devops/nginx/origin.key
+
+        #Copy config files
+        command: mv ./${{ github.event.repository.name }}/devops/nginx .
+        command: mv ./${{ github.event.repository.name }}/devops/docker-compose/docker-compose.yml .
+
+    # Catch SSM outputs
+    - name: Get the outputs
+      run: echo "The Command id is ${{ steps.ssm.outputs.command-id }}"
       
