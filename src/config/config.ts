@@ -40,7 +40,7 @@ export const config: IOcnToolsConfig = {
     },
     msp: {
         port: 3001,
-        publicIP: "http://d5a04fcf5d83.ngrok.io",
+        publicIP: "https://dev.ev-dashboard-msp.energyweb.org",
         roles: [
             {
                 party_id: "KWB",
