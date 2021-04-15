@@ -1,7 +1,7 @@
 /dist/
 /node_modules/
 
-src/config/config.ts
+
 *.db
 
 deploy_rsa*

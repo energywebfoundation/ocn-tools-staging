@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    restart: always
+    volumes:
+      - "./devops/nginx:/etc/nginx/conf.d:ro"
+    ports:
+      - "80:80"
+      - "443:443"
+      
+  cpo:
+    build:
+      context: ./ocn-tools-staging
+      dockerfile: Dockerfile
+    image: "${AWS_ACCOUNT_ID_STAGING}:${IMAGE_TAG}"
+    container_name: cpo_simulation
+    restart: always
+    volumes:
+      - "./cpo.db:/home/node/app/cpo.db:rw"
+    env_file:
+      - .env
+    command: ["./wait-for-node.sh", "--cpo"]

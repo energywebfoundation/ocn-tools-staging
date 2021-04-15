@@ -2,34 +2,44 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+-alpha*'
+      - '[0-9]+.[0-9]+.[0-9]+-beta*'
     
 env:
   ECR_REPOSITORY: ew-elia
+  AWS_REPOSITORY_URL: "${{ secrets.AWS_ACCOUNT_ID_STAGING }}..dkr.ecr.eu-central-1.amazonaws.com/$ECR_REPOSITORY"
+  
+  #For future changes
+  RPC_URL: "https://volta-internal-archive.energyweb.org"
+  MSP_DNS: "https://dev.ev-dashboard-msp.energyweb.org"
+  CPO_DNS: "https://dev.ev-dashboard-cpo.energyweb.org"
+
 
 jobs:
-  
+
+  cancel-previous:
+    name: 'Cancel Previous Runs'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: styfle/cancel-workflow-action@0.5.0
+        with:
+          #workflow_id: 479426
+          access_token: ${{ github.token }}
+
   build:
 
     runs-on: ubuntu-latest
-
+    needs: cancel-previous
     steps:
 
     - name: Checkout
       uses: actions/checkout@v2
-      
-    - name: Choose proper config
-      run: cp src/config/config.local.ts src/config/config.ts
     
     - name: Get the tag version
       id: get_version
       run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
-      
-    - name: Get current date
-      id: date
-      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
       
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -45,7 +55,7 @@ jobs:
     - name: Build & push docker images
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_TAG: ${{ steps.date.outputs.date }}
+        IMAGE_TAG: ${{ steps.get_version.outputs.VERSION }}
       run: |
         docker build -f Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
@@ -53,4 +63,83 @@ jobs:
     - name: Logout of Amazon ECR
       if: always()
       run: docker logout ${{ steps.login-ecr.outputs.registry }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deploy to elia_staging
+      env:
+          IMAGE_TAG: ${{ steps.get_version.outputs.VERSION }}
+
+      uses: peterkimzz/aws-ssm-send-command@master
+      id: ssm
+      with:
+        aws-region: eu-central-1
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        instance-ids: ${{ secrets.INSTANCE_ID }}
+
+        working-directory: /home/ubuntu/docker-stack/${{ github.event.repository.name }}
+        command: ls -la
+        command: echo $USER
+        
+        #Update code
+        command: git pull
+        
+        #Setup aws Credentials/Variables
+
+        #Remove old values
+        command: rm .env
+
+        #Export AWS credentials
+        command: export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+        command: export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+        #Set up rest of variables
+        command: touch .env
+        command: echo AWS_DEFAULT_REGION=eu-central-1 >> .env
+        command: echo IMAGE_TAG=$IMAGE_TAG >> .env
+        command: echo AWS_ACCOUNT_ID_STAGING=${{ secrets.AWS_ACCOUNT_ID_STAGING }} >> .env
+        command: echo CPO_PRIVATE_KEY=${{ secrets.CPO_PRIVATE_KEY }} >> .env
+        command: echo CPO_TOKEN_A=${{ secrets.CPO_TOKEN_A }} >> .env
+        command: echo AWS_REPOSITORY_URL=$AWS_REPOSITORY_URL >> .env
+
+        #create new files
+        command: echo ${{ secrets.NGINX_CERTIFICATE }} > ./${{ github.event.repository.name }}/devops/nginx/origin.crt
+        command: echo ${{ secrets.NGINX_KEY }} > ./${{ github.event.repository.name }}/devops/nginx/origin.key
+          
+        #login to docker (AWS)
+        command: aws ecr get-login --no-include-email --region eu-central-1 | bash
+
+        #Pull latest image
+        command: docker pull $AWS_REPOSITORY_URL:$IMAGE_TAG
+
+        #Logout from AWS
+        command: docker logout $AWS_REPOSITORY_URL
+
+        #Cleanup
+        command: unset AWS_ACCESS_KEY_ID
+        command: unset AWS_SECRET_ACCESS_KEY
+
+    - name: Cleanup
+      if: ${{ failure() }}
+      uses: peterkimzz/aws-ssm-send-command@master
+      id: ssm
+      with:
+        aws-region: eu-central-1
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        instance-ids: ${{ secrets.INSTANCE_ID }}
+
+        working-directory: /home/ubuntu/docker-stack/${{ github.event.repository.name }}
+
+        #Cleanup
+        command: unset AWS_ACCESS_KEY_ID
+        command: unset AWS_SECRET_ACCESS_KEY
+
+    # Catch SSM outputs
+    - name: Get the outputs
+      run: echo "The Command id is ${{ steps.ssm.outputs.command-id }}"
+
+    
       
