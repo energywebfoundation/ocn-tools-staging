@@ -67,6 +67,25 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+    - name: prepare-script
+      run: |
+        pwd
+        ls -la
+        echo $USER
+        echo git pull > install.sh
+        echo rm .env >> install.sh
+        cat install.sh
+        
+    - name: Read install.sh
+      id: install-script-reading
+      uses: juliangruber/read-file-action@v1
+      with:
+        path: ./install.sh
+        
+    - name: Get the tag version
+      id: get_version
+      run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+        
     - name: Deploy to elia_staging
       env:
           IMAGE_TAG: ${{ steps.get_version.outputs.VERSION }}
@@ -80,51 +99,51 @@ jobs:
         instance-ids: ${{ secrets.INSTANCE_ID }}
 
         working-directory: /home/ubuntu/docker-stack/${{ github.event.repository.name }}
-        command: ls -la
-        command: echo $USER
+        command: echo ${{ steps.package.outputs.content }} > install.sh
+        comment: "First try"
         
-        #Update code
-        command: git pull
+#         #Update code
+#         command: git pull
         
-        #Setup aws Credentials/Variables
+#         #Setup aws Credentials/Variables
 
-        #Remove old values
-        command: rm .env
+#         #Remove old values
+#         command: rm .env
 
-        #Export AWS credentials
-        command: export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-        command: export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#         #Export AWS credentials
+#         command: export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+#         command: export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-        #Set up rest of variables
-        command: touch .env
-        command: echo AWS_DEFAULT_REGION=eu-central-1 >> .env
-        command: echo IMAGE_TAG=$IMAGE_TAG >> .env
-        command: echo AWS_ACCOUNT_ID_STAGING=${{ secrets.AWS_ACCOUNT_ID_STAGING }} >> .env
-        command: echo CPO_PRIVATE_KEY=${{ secrets.CPO_PRIVATE_KEY }} >> .env
-        command: echo CPO_TOKEN_A=${{ secrets.CPO_TOKEN_A }} >> .env
-        command: echo AWS_REPOSITORY_URL=$AWS_REPOSITORY_URL >> .env
+#         #Set up rest of variables
+#         command: touch .env
+#         command: echo AWS_DEFAULT_REGION=eu-central-1 >> .env
+#         command: echo IMAGE_TAG=$IMAGE_TAG >> .env
+#         command: echo AWS_ACCOUNT_ID_STAGING=${{ secrets.AWS_ACCOUNT_ID_STAGING }} >> .env
+#         command: echo CPO_PRIVATE_KEY=${{ secrets.CPO_PRIVATE_KEY }} >> .env
+#         command: echo CPO_TOKEN_A=${{ secrets.CPO_TOKEN_A }} >> .env
+#         command: echo AWS_REPOSITORY_URL=$AWS_REPOSITORY_URL >> .env
 
-        #create new files
-        command: echo ${{ secrets.NGINX_CERTIFICATE }} > ./${{ github.event.repository.name }}/devops/nginx/origin.crt
-        command: echo ${{ secrets.NGINX_KEY }} > ./${{ github.event.repository.name }}/devops/nginx/origin.key
+#         #create new files
+#         command: echo ${{ secrets.NGINX_CERTIFICATE }} > ./${{ github.event.repository.name }}/devops/nginx/origin.crt
+#         command: echo ${{ secrets.NGINX_KEY }} > ./${{ github.event.repository.name }}/devops/nginx/origin.key
           
-        #login to docker (AWS)
-        command: aws ecr get-login --no-include-email --region eu-central-1 | bash
+#         #login to docker (AWS)
+#         command: aws ecr get-login --no-include-email --region eu-central-1 | bash
 
-        #Pull latest image
-        command: docker pull $AWS_REPOSITORY_URL:$IMAGE_TAG
+#         #Pull latest image
+#         command: docker pull $AWS_REPOSITORY_URL:$IMAGE_TAG
 
-        #Logout from AWS
-        command: docker logout $AWS_REPOSITORY_URL
+#         #Logout from AWS
+#         command: docker logout $AWS_REPOSITORY_URL
 
-        #Cleanup
-        command: unset AWS_ACCESS_KEY_ID
-        command: unset AWS_SECRET_ACCESS_KEY
+#         #Cleanup
+#         command: unset AWS_ACCESS_KEY_ID
+#         command: unset AWS_SECRET_ACCESS_KEY
 
     - name: Cleanup
       if: ${{ failure() }}
       uses: peterkimzz/aws-ssm-send-command@master
-      id: ssm
+      id: ssm-cleanup
       with:
         aws-region: eu-central-1
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -135,7 +154,7 @@ jobs:
 
         #Cleanup
         command: unset AWS_ACCESS_KEY_ID
-        command: unset AWS_SECRET_ACCESS_KEY
+#         command: unset AWS_SECRET_ACCESS_KEY
 
     # Catch SSM outputs
     - name: Get the outputs
