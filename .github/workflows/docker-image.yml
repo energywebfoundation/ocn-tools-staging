@@ -104,10 +104,6 @@ jobs:
         command: echo CPO_TOKEN_A=${{ secrets.CPO_TOKEN_A }} >> .env
         command: echo AWS_REPOSITORY_URL=$AWS_REPOSITORY_URL >> .env
 
-        #remove nginx certificates and key
-        command: rm ./${{ github.event.repository.name }}/devops/nginx/origin.crt
-        command: rm ./${{ github.event.repository.name }}/devops/nginx/origin.key
-
         #create new files
         command: echo ${{ secrets.NGINX_CERTIFICATE }} > ./${{ github.event.repository.name }}/devops/nginx/origin.crt
         command: echo ${{ secrets.NGINX_KEY }} > ./${{ github.event.repository.name }}/devops/nginx/origin.key
@@ -125,7 +121,25 @@ jobs:
         command: unset AWS_ACCESS_KEY_ID
         command: unset AWS_SECRET_ACCESS_KEY
 
+    - name: Cleanup
+      if: ${{ failure() }}
+      uses: peterkimzz/aws-ssm-send-command@master
+      id: ssm
+      with:
+        aws-region: eu-central-1
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        instance-ids: ${{ secrets.INSTANCE_ID }}
+
+        working-directory: /home/ubuntu/docker-stack/${{ github.event.repository.name }}
+
+        #Cleanup
+        command: unset AWS_ACCESS_KEY_ID
+        command: unset AWS_SECRET_ACCESS_KEY
+
     # Catch SSM outputs
     - name: Get the outputs
       run: echo "The Command id is ${{ steps.ssm.outputs.command-id }}"
+
+    
       
