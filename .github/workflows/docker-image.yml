@@ -94,7 +94,7 @@ jobs:
           touch .env
           touch ./devops/nginx/origin.crt;
           touch ./devops/nginx/origin.key;
-          sudo chown -R ${{ secrets.USER }}:${{ secrets.USER }} .
+          sudo chown -R ${{ secrets.USER }}:${{ secrets.USER }} .;
           echo AWS_DEFAULT_REGION=eu-central-1 > .env;
           echo IMAGE_TAG=${{ env.IMAGE_TAG }}>> .env;
           echo AWS_ACCOUNT_ID_STAGING=${{ secrets.AWS_ACCOUNT_ID_STAGING }} >> .env;
