@@ -8,7 +8,7 @@ on:
     
 env:
   ECR_REPOSITORY: ew-elia
-  AWS_REPOSITORY_URL: "${{ secrets.AWS_ACCOUNT_ID_STAGING }}..dkr.ecr.eu-central-1.amazonaws.com/ew-elia"
+  AWS_REPOSITORY_URL: "${{ secrets.AWS_ACCOUNT_ID_STAGING }}.dkr.ecr.eu-central-1.amazonaws.com/ew-elia"
   
   #For future changes
   RPC_URL: "https://volta-internal-archive.energyweb.org"
