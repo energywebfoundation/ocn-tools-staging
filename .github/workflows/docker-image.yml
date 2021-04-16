@@ -95,8 +95,6 @@ jobs:
           touch ./devops/nginx/origin.crt;
           touch ./devops/nginx/origin.key;
           sudo chown -R ${{ secrets.USER }}:${{ secrets.USER }} .
-          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }};
-          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }};
           echo AWS_DEFAULT_REGION=eu-central-1 > .env;
           echo IMAGE_TAG=${{ env.IMAGE_TAG }}>> .env;
           echo AWS_ACCOUNT_ID_STAGING=${{ secrets.AWS_ACCOUNT_ID_STAGING }} >> .env;
@@ -108,25 +106,7 @@ jobs:
           aws ecr get-login --no-include-email --region eu-central-1 | bash;
           docker pull ${{ env.AWS_REPOSITORY_URL }}:${{ env.IMAGE_TAG }};
           docker logout ${{ env.AWS_REPOSITORY_URL }};
-          unset AWS_ACCESS_KEY_ID;
-          unset AWS_SECRET_ACCESS_KEY
         comment: "First try"
-
-    - name: Cleanup
-      if: ${{ failure() }}
-      uses: peterkimzz/aws-ssm-send-command@master
-      id: ssm-cleanup
-      with:
-        aws-region: eu-central-1
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        instance-ids: ${{ secrets.INSTANCE_ID }}
-
-        working-directory: /home/ubuntu/docker-stack/${{ github.event.repository.name }}
-
-        #Cleanup
-        command: unset AWS_ACCESS_KEY_ID;unset AWS_SECRET_ACCESS_KEY
-        comment: "Simple cleanup" 
 
     # Catch SSM outputs
     - name: Get the outputs
