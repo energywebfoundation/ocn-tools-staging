@@ -1,16 +1,18 @@
-name: Docker Image CI
-
+name: Elia Ocn Tools Staging
 on:
   push:
     tags:
       - '[0-9]+.[0-9]+.[0-9]+-alpha*'
       - '[0-9]+.[0-9]+.[0-9]+-beta*'
-  
+
+env:
   #For future changes
   RPC_URL: "https://volta-internal-archive.energyweb.org"
   MSP_DNS: "https://dev.ev-dashboard-msp.energyweb.org"
   CPO_DNS: "https://dev.ev-dashboard-cpo.energyweb.org"
 
+
+  
 
 jobs:
 
