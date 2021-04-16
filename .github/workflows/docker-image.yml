@@ -81,9 +81,9 @@ jobs:
     # - name: Deploy to elia_staging
     #   env:
     #       IMAGE_TAG: ${{ steps.get_version.outputs.VERSION }}
-    - name: Trigger SSM
-      id: SSM_trigger
-      run: aws ssm send-command --instance-ids ${{ secrets.INSTANCE_ID }} --document-name "Elia_Test_OCN_Tools" --comment "IP config" --parameters "content=Kamil"
+    # - name: Trigger SSM
+    #   id: SSM_trigger
+    #   run: aws ssm send-command --instance-ids ${{ secrets.INSTANCE_ID }} --document-name "Elia_Test_OCN_Tools" --comment "IP config" --parameters "content=Kamil"
 
     - name: Deplyoment Via SSM
       uses: peterkimzz/aws-ssm-send-command@master
@@ -95,7 +95,7 @@ jobs:
         instance-ids: ${{ secrets.INSTANCE_ID }}
 
         working-directory: /home/ubuntu/docker-stack/${{ github.event.repository.name }}
-        command: touch .env
+        command: touch .env;echo ${{ github.event.repository.name }}; echo "tralala"
         comment: "First try"
         
 #         #Update code
