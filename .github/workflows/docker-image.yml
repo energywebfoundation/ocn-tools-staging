@@ -91,7 +91,7 @@ jobs:
         working-directory: /home/ubuntu/docker-stack/${{ github.event.repository.name }}
         command: >-
           sudo git pull;
-          touch .env
+          touch .env;
           touch ./devops/nginx/origin.crt;
           touch ./devops/nginx/origin.key;
           sudo chown -R ${{ secrets.USER }}:${{ secrets.USER }} .;
