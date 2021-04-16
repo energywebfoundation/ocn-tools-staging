@@ -104,6 +104,7 @@ jobs:
           aws ecr get-login --no-include-email --region eu-central-1 | bash;
           docker pull ${{ secrets.AWS_REPOSITORY_URL }}:${{ env.IMAGE_TAG }};
           docker logout ${{ secrets.AWS_REPOSITORY_URL }};
+          docker-compose up -d
         comment: "Deplyoment of new version"
 
     # Catch SSM outputs
