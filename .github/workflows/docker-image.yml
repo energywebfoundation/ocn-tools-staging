@@ -28,52 +28,51 @@ jobs:
           #workflow_id: 479426
           access_token: ${{ github.token }}
 
-  # build:
+  build:
 
-  #   runs-on: ubuntu-latest
-  #   needs: cancel-previous
-  #   steps:
+    runs-on: ubuntu-latest
+    needs: cancel-previous
+    steps:
 
-  #   - name: Checkout
-  #     uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
     
-  #   - name: Get the tag version
-  #     id: get_version
-  #     run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+    - name: Get the tag version
+      id: get_version
+      run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
       
-  #   - name: Configure AWS credentials
-  #     uses: aws-actions/configure-aws-credentials@v1
-  #     with:
-  #       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #       aws-region: eu-central-1
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-central-1
 
-  #   - name: Login to Amazon ECR
-  #     id: login-ecr
-  #     uses: aws-actions/amazon-ecr-login@v1
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
       
-  #   - name: Build & push docker images
-  #     env:
-  #       ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-  #       IMAGE_TAG: ${{ steps.get_version.outputs.VERSION }}
-  #     run: |
-  #       docker build -f Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-  #       docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+    - name: Build & push docker images
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ steps.get_version.outputs.VERSION }}
+      run: |
+        docker build -f Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
     
-  #   - name: Logout of Amazon ECR
-  #     if: always()
-  #     run: docker logout ${{ steps.login-ecr.outputs.registry }}
+    - name: Logout of Amazon ECR
+      if: always()
+      run: docker logout ${{ steps.login-ecr.outputs.registry }}
 
   deploy:
+    needs: build
     runs-on: ubuntu-latest
     steps:
     - name: Get the tag version
       id: get_version
       run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
         
-    # - name: Deploy to elia_staging
-    #   env:
-    #       IMAGE_TAG: ${{ steps.get_version.outputs.VERSION }}
+    # Alternatively you could create SSM document via terraform and just trigger it passing various of parameters. Example below.
     # - name: Trigger SSM
     #   id: SSM_trigger
     #   run: aws ssm send-command --instance-ids ${{ secrets.INSTANCE_ID }} --document-name "Elia_Test_OCN_Tools" --comment "IP config" --parameters "content=Kamil"
@@ -91,50 +90,23 @@ jobs:
 
         working-directory: /home/ubuntu/docker-stack/${{ github.event.repository.name }}
         command: >-
-          git pull;
+          sudo git pull;
           export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }};
-          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          unset AWS_ACCESS_KEY_ID
+          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }};
+          echo AWS_DEFAULT_REGION=eu-central-1 > .env;
+          echo IMAGE_TAG=$IMAGE_TAG >> .env;
+          echo AWS_ACCOUNT_ID_STAGING=${{ secrets.AWS_ACCOUNT_ID_STAGING }} >> .env;
+          echo CPO_PRIVATE_KEY=${{ secrets.CPO_PRIVATE_KEY }} >> .env;
+          echo CPO_TOKEN_A=${{ secrets.CPO_TOKEN_A }} >> .env;
+          echo AWS_REPOSITORY_URL=$AWS_REPOSITORY_URL >> .env;
+          echo ${{ secrets.NGINX_CERTIFICATE }} > ./${{ github.event.repository.name }}/devops/nginx/origin.crt;
+          echo ${{ secrets.NGINX_KEY }} > ./${{ github.event.repository.name }}/devops/nginx/origin.key;
+          aws ecr get-login --no-include-email --region eu-central-1 | bash;
+          docker pull $AWS_REPOSITORY_URL:$IMAGE_TAG;
+          docker logout $AWS_REPOSITORY_URL;
+          unset AWS_ACCESS_KEY_ID;
           unset AWS_SECRET_ACCESS_KEY
         comment: "First try"
-        
-        # #Update code
-        # command: git pull
-        
-        # #Setup aws Credentials/Variables
-
-        # #Remove old values
-        # command: rm .env
-
-        # #Export AWS credentials
-        # command: export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-        # command: export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-        # #Set up rest of variables
-        # command: touch .env
-        # command: echo AWS_DEFAULT_REGION=eu-central-1 >> .env
-        # command: echo IMAGE_TAG=$IMAGE_TAG >> .env
-        # command: echo AWS_ACCOUNT_ID_STAGING=${{ secrets.AWS_ACCOUNT_ID_STAGING }} >> .env
-        # command: echo CPO_PRIVATE_KEY=${{ secrets.CPO_PRIVATE_KEY }} >> .env
-        # command: echo CPO_TOKEN_A=${{ secrets.CPO_TOKEN_A }} >> .env
-        # command: echo AWS_REPOSITORY_URL=$AWS_REPOSITORY_URL >> .env
-
-        # #create new files
-        # command: echo ${{ secrets.NGINX_CERTIFICATE }} > ./${{ github.event.repository.name }}/devops/nginx/origin.crt
-        # command: echo ${{ secrets.NGINX_KEY }} > ./${{ github.event.repository.name }}/devops/nginx/origin.key
-          
-        # #login to docker (AWS)
-        # command: aws ecr get-login --no-include-email --region eu-central-1 | bash
-
-        # #Pull latest image
-        # command: docker pull $AWS_REPOSITORY_URL:$IMAGE_TAG
-
-        # #Logout from AWS
-        # command: docker logout $AWS_REPOSITORY_URL
-
-        # #Cleanup
-        # command: unset AWS_ACCESS_KEY_ID
-        # command: unset AWS_SECRET_ACCESS_KEY
 
     - name: Cleanup
       if: ${{ failure() }}
