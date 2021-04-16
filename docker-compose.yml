@@ -13,7 +13,6 @@ services:
       
   cpo:
     build:
-      context: ./ocn-tools-staging
       dockerfile: Dockerfile
     image: "${AWS_ACCOUNT_ID_STAGING}:${IMAGE_TAG}"
     container_name: cpo_simulation
