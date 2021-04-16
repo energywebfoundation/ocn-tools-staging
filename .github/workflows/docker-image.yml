@@ -67,21 +67,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - name: prepare-script
-      run: |
-        pwd
-        ls -la
-        echo $USER
-        echo git pull > install.sh
-        echo rm .env >> install.sh
-        cat install.sh
-        
-    - name: Read install.sh
-      id: install-script-reading
-      uses: juliangruber/read-file-action@v1
-      with:
-        path: ./install.sh
-        
     - name: Get the tag version
       id: get_version
       run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
@@ -89,7 +74,15 @@ jobs:
     - name: Deploy to elia_staging
       env:
           IMAGE_TAG: ${{ steps.get_version.outputs.VERSION }}
+    - name: Trigger SSM
+      id: SSM_trigger
+      run: aws ssm send-command \
+        --instance-ids ${{ secrets.INSTANCE_ID }} \
+        --document-name "Elia_Test_OCN_Tools" \
+        --comment "IP config" \
+        --parameters "content=Kamil"
 
+    - name: Deplyoment Via SSM
       uses: peterkimzz/aws-ssm-send-command@master
       id: ssm
       with:
@@ -99,7 +92,7 @@ jobs:
         instance-ids: ${{ secrets.INSTANCE_ID }}
 
         working-directory: /home/ubuntu/docker-stack/${{ github.event.repository.name }}
-        command: echo ${{ steps.package.outputs.content }} > install.sh
+        command: touch .env
         comment: "First try"
         
 #         #Update code
