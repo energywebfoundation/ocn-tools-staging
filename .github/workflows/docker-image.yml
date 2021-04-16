@@ -5,10 +5,6 @@ on:
     tags:
       - '[0-9]+.[0-9]+.[0-9]+-alpha*'
       - '[0-9]+.[0-9]+.[0-9]+-beta*'
-    
-env:
-  ECR_REPOSITORY: ew-elia
-  AWS_REPOSITORY_URL: "${{ secrets.AWS_ACCOUNT_ID_STAGING }}.dkr.ecr.eu-central-1.amazonaws.com/ew-elia"
   
   #For future changes
   RPC_URL: "https://volta-internal-archive.energyweb.org"
@@ -57,8 +53,8 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ steps.get_version.outputs.VERSION }}
       run: |
-        docker build -f Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker build -f Dockerfile -t $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:$IMAGE_TAG
     
     - name: Logout of Amazon ECR
       if: always()
@@ -100,13 +96,13 @@ jobs:
           echo AWS_ACCOUNT_ID_STAGING=${{ secrets.AWS_ACCOUNT_ID_STAGING }} >> .env;
           echo CPO_PRIVATE_KEY=${{ secrets.CPO_PRIVATE_KEY }} >> .env;
           echo CPO_TOKEN_A=${{ secrets.CPO_TOKEN_A }} >> .env;
-          echo AWS_REPOSITORY_URL=${{ env.AWS_REPOSITORY_URL }} >> .env;
+          echo AWS_REPOSITORY_URL=${{ secrets.AWS_REPOSITORY_URL }} >> .env;
           echo ${{ secrets.NGINX_CERTIFICATE }} | base64 -d > ./devops/nginx/origin.crt;
           echo ${{ secrets.NGINX_KEY }} | base64 -d > ./devops/nginx/origin.key;
           aws ecr get-login --no-include-email --region eu-central-1 | bash;
-          docker pull ${{ env.AWS_REPOSITORY_URL }}:${{ env.IMAGE_TAG }};
-          docker logout ${{ env.AWS_REPOSITORY_URL }};
-        comment: "First try"
+          docker pull ${{ secrets.AWS_REPOSITORY_URL }}:${{ env.IMAGE_TAG }};
+          docker logout ${{ secrets.AWS_REPOSITORY_URL }};
+        comment: "Deplyoment of new version"
 
     # Catch SSM outputs
     - name: Get the outputs
