@@ -91,10 +91,14 @@ jobs:
         working-directory: /home/ubuntu/docker-stack/${{ github.event.repository.name }}
         command: >-
           sudo git pull;
+          touch .env
+          touch ./devops/nginx/origin.crt;
+          touch ./devops/nginx/origin.key;
+          sudo chown -R ${{ secrets.USER }}:${{ secrets.USER }} .
           export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }};
           export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }};
           echo AWS_DEFAULT_REGION=eu-central-1 > .env;
-          echo IMAGE_TAG=$IMAGE_TAG >> .env;
+          echo IMAGE_TAG=${{ env.IMAGE_TAG }}>> .env;
           echo AWS_ACCOUNT_ID_STAGING=${{ secrets.AWS_ACCOUNT_ID_STAGING }} >> .env;
           echo CPO_PRIVATE_KEY=${{ secrets.CPO_PRIVATE_KEY }} >> .env;
           echo CPO_TOKEN_A=${{ secrets.CPO_TOKEN_A }} >> .env;
