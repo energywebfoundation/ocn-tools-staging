@@ -71,9 +71,9 @@ jobs:
       id: get_version
       run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
         
-    - name: Deploy to elia_staging
-      env:
-          IMAGE_TAG: ${{ steps.get_version.outputs.VERSION }}
+    # - name: Deploy to elia_staging
+    #   env:
+    #       IMAGE_TAG: ${{ steps.get_version.outputs.VERSION }}
     - name: Trigger SSM
       id: SSM_trigger
       run: aws ssm send-command \
