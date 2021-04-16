@@ -76,11 +76,7 @@ jobs:
     #       IMAGE_TAG: ${{ steps.get_version.outputs.VERSION }}
     - name: Trigger SSM
       id: SSM_trigger
-      run: aws ssm send-command \
-        --instance-ids ${{ secrets.INSTANCE_ID }} \
-        --document-name "Elia_Test_OCN_Tools" \
-        --comment "IP config" \
-        --parameters "content=Kamil"
+      run: aws ssm send-command --instance-ids ${{ secrets.INSTANCE_ID }} --document-name "Elia_Test_OCN_Tools" --comment "IP config" --parameters "content=Kamil"
 
     - name: Deplyoment Via SSM
       uses: peterkimzz/aws-ssm-send-command@master
