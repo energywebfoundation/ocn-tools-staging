@@ -12,9 +12,7 @@ services:
       - "443:443"
       
   cpo:
-    build:
-      dockerfile: Dockerfile
-    image: "${AWS_ACCOUNT_ID_STAGING}:${IMAGE_TAG}"
+    image: "${AWS_REPOSITORY_URL}:${IMAGE_TAG}"
     container_name: cpo_simulation
     restart: always
     volumes:
