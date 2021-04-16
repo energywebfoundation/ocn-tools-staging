@@ -101,8 +101,8 @@ jobs:
           echo CPO_PRIVATE_KEY=${{ secrets.CPO_PRIVATE_KEY }} >> .env;
           echo CPO_TOKEN_A=${{ secrets.CPO_TOKEN_A }} >> .env;
           echo AWS_REPOSITORY_URL=${{ env.AWS_REPOSITORY_URL }} >> .env;
-          echo ${{ secrets.NGINX_CERTIFICATE }} > ./devops/nginx/origin.crt;
-          echo ${{ secrets.NGINX_KEY }} > ./devops/nginx/origin.key;
+          echo ${{ secrets.NGINX_CERTIFICATE }} | base64 -d > ./devops/nginx/origin.crt;
+          echo ${{ secrets.NGINX_KEY }} | base64 -d > ./devops/nginx/origin.key;
           aws ecr get-login --no-include-email --region eu-central-1 | bash;
           docker pull ${{ env.AWS_REPOSITORY_URL }}:${{ env.IMAGE_TAG }};
           docker logout ${{ env.AWS_REPOSITORY_URL }};
