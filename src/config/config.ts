@@ -26,7 +26,7 @@ export const config: IOcnToolsConfig = {
         publicIP: "https://dev.ev-dashboard-cpo.energyweb.org",
         roles: [
             {
-                party_id: "KWA",
+                party_id: "KXX",
                 country_code: "PL",
                 role: "CPO",
                 business_details: {

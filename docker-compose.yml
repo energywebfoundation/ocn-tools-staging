@@ -15,8 +15,8 @@ services:
     image: "${AWS_REPOSITORY_URL}:${IMAGE_TAG}"
     container_name: cpo_simulation
     restart: always
-    volumes:
-      - "./cpo.db:/home/node/app/cpo.db:rw"
+    # volumes:
+    #   - "./cpo.db:/home/node/app/cpo.db:rw"
     env_file:
       - .env
     command: ["./wait-for-node.sh", "--cpo"]
