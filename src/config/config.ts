@@ -26,7 +26,7 @@ export const config: IOcnToolsConfig = {
         publicIP: "https://dev.ev-dashboard-cpo.energyweb.org",
         roles: [
             {
-                party_id: "KXX",
+                party_id: "KZA",
                 country_code: "PL",
                 role: "CPO",
                 business_details: {
@@ -43,7 +43,7 @@ export const config: IOcnToolsConfig = {
         publicIP: "https://dev.ev-dashboard-msp.energyweb.org",
         roles: [
             {
-                party_id: "KWB",
+                party_id: "KZB",
                 country_code: "PL",
                 role: "EMSP",
                 business_details: {
