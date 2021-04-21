@@ -8,3 +8,4 @@ deploy_rsa*
 !deploy_rsa.enc
 
 .vscode/
+.env
