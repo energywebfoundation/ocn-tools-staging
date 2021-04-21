@@ -24,8 +24,8 @@ WORKDIR /home/node/app
 
 ENV NODE_ENV=production
 
-COPY --from=builder /ocn-tools/node_modules ./node_modules
-COPY --from=builder /ocn-tools/dist ./dist
+COPY --from=builder --chown=root:node /ocn-tools/node_modules ./node_modules
+COPY --from=builder --chown=root:node /ocn-tools/dist ./dist
 COPY --from=builder --chown=node /ocn-tools/wait-for-node.sh ./
 COPY --from=builder --chown=node /ocn-tools/wait-for-node.dev.sh ./
 
