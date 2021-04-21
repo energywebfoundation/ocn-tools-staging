@@ -96,7 +96,7 @@ jobs:
           echo AWS_DEFAULT_REGION=eu-central-1 > .env;
           echo IMAGE_TAG=${{ env.IMAGE_TAG }}>> .env;
           echo AWS_ACCOUNT_ID_STAGING=${{ secrets.AWS_ACCOUNT_ID_STAGING }} >> .env;
-          echo CPO_IDENTITY=${{ secrets.CPO_PRIVATE_KEY }} >> .env;
+          echo CPO_PRIVATE_KEY=${{ secrets.CPO_PRIVATE_KEY }} >> .env;
           echo CPO_TOKEN_A=${{ secrets.CPO_TOKEN_A }} >> .env;
           echo AWS_REPOSITORY_URL=${{ secrets.AWS_REPOSITORY_URL }} >> .env;
           echo ${{ secrets.NGINX_CERTIFICATE }} | base64 -d > ./devops/nginx/origin.crt;
