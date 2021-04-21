@@ -15,6 +15,7 @@ services:
     image: "${AWS_REPOSITORY_URL}:${IMAGE_TAG}"
     container_name: cpo_simulation
     restart: always
+    network_mode: "host"
     volumes:
        - ./cpo.db:/home/node/app/cpo.db
     env_file:
@@ -25,6 +26,7 @@ services:
   #   image: "${AWS_REPOSITORY_URL}:${IMAGE_TAG}"
   #   container_name: msp_simulation
   #   restart: always
+  #   network_mode: "host"
   #   volumes:
   #      - ./msp.db:/home/node/app/msp.db
   #   env_file:
