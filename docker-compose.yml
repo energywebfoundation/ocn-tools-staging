@@ -19,4 +19,7 @@ services:
        - ./cpo.db:/home/node/app/cpo.db
     env_file:
       - .env
+    environment:
+      OCN_IDENTITY: CPO_PRIVATE_KEY
+      OCN_TOKEN_A: CPO_TOKEN_A
     command: ["./wait-for-node.sh", "--cpo"]
