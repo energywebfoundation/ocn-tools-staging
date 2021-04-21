@@ -18,8 +18,15 @@ services:
     volumes:
        - ./cpo.db:/home/node/app/cpo.db
     env_file:
-      - .env
-    environment:
-      OCN_IDENTITY: CPO_PRIVATE_KEY
-      OCN_TOKEN_A: CPO_TOKEN_A
+      - .env_cpo
     command: ["./wait-for-node.sh", "--cpo"]
+
+  # msp:
+  #   image: "${AWS_REPOSITORY_URL}:${IMAGE_TAG}"
+  #   container_name: msp_simulation
+  #   restart: always
+  #   volumes:
+  #      - ./msp.db:/home/node/app/msp.db
+  #   env_file:
+  #     - .env_msp
+  #   command: ["./wait-for-node.sh", "--msp"]
