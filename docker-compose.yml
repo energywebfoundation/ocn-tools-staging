@@ -25,7 +25,6 @@ services:
     image: "${AWS_REPOSITORY_URL}:${IMAGE_TAG}"
     container_name: msp
     restart: always
-    network_mode: "host"
     volumes:
        - ./msp.db:/home/node/app/msp.db
     env_file:
