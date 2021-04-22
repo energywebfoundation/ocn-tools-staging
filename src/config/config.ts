@@ -23,7 +23,7 @@ export const config: IOcnToolsConfig = {
     },
     cpo: {
         port: 3000,
-        publicIP: "https://dev.ev-dashboard-cpo.energyweb.org",
+        publicIP: "https://dev-ev-dashboard-cpo.energyweb.org",
         roles: [
             {
                 party_id: "KZA",
@@ -40,7 +40,7 @@ export const config: IOcnToolsConfig = {
     },
     msp: {
         port: 3001,
-        publicIP: "https://dev.ev-dashboard-msp.energyweb.org",
+        publicIP: "https://dev-ev-dashboard-msp.energyweb.org",
         roles: [
             {
                 party_id: "KZB",
@@ -66,7 +66,7 @@ export const config: IOcnToolsConfig = {
         },
         asset_claims_iam: {
             cacheServerUrl: "https://identitycache-dev.energyweb.org/",
-            natsServerUrl: "http://identityevents-dev-nats.energyweb.org",
+            natsServerUrl: "identityevents-dev-nats.energyweb.org",
             natsProtocolPort: "4222",
         }
     },

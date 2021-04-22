@@ -6,29 +6,28 @@ services:
     container_name: nginx
     restart: always
     volumes:
-      - "./devops/nginx:/etc/nginx/conf.d:ro"
+      - "./devops/nginx:/etc/nginx/conf.d:rw"
     ports:
       - "80:80"
       - "443:443"
       
   cpo:
     image: "${AWS_REPOSITORY_URL}:${IMAGE_TAG}"
-    container_name: cpo_simulation
+    container_name: cpo
     restart: always
-    network_mode: "host"
     volumes:
        - ./cpo.db:/home/node/app/cpo.db
     env_file:
       - .env_cpo
     command: ["./wait-for-node.sh", "--cpo"]
 
-  # msp:
-  #   image: "${AWS_REPOSITORY_URL}:${IMAGE_TAG}"
-  #   container_name: msp_simulation
-  #   restart: always
-  #   network_mode: "host"
-  #   volumes:
-  #      - ./msp.db:/home/node/app/msp.db
-  #   env_file:
-  #     - .env_msp
-  #   command: ["./wait-for-node.sh", "--msp"]
+  msp:
+    image: "${AWS_REPOSITORY_URL}:${IMAGE_TAG}"
+    container_name: msp
+    restart: always
+    network_mode: "host"
+    volumes:
+       - ./msp.db:/home/node/app/msp.db
+    env_file:
+      - .env_msp
+    command: ["./wait-for-node.sh", "--msp"]
