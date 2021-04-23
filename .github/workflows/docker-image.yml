@@ -6,13 +6,25 @@ on:
       - '[0-9]+.[0-9]+.[0-9]+-beta*'
 
 env:
-  #For future changes
-  RPC_URL: "https://volta-internal-archive.energyweb.org"
-  MSP_DNS: "https://dev.ev-dashboard-msp.energyweb.org"
-  CPO_DNS: "https://dev.ev-dashboard-cpo.energyweb.org"
+  OCN_NODE_URL: "https://test-ocn.emobilify.com"
+  OCN_STAGE: "volta"
 
+  CPO_PORT: "3000"
+  CPO_ASSET_CREATION_DELAY: "10000"
 
-  
+  MSP_PORT: "3001"
+  MSP_ASSET_CREATION_DELAY: "10000"
+  MSP_ASSET_COUNT: "200"
+
+  PREQUALIFICATION_ISSUER_ROLE: "tso.roles.evdashboard.apps.elia.iam.ewc"
+  PREQUALIFICATION_ROLE: "prequalified.roles.flexmarket.apps.elia.iam.ewc"
+  EWC_RPC_URL: "https://volta-internal-archive.energyweb.org"
+  USER_CACHE_SERVER_URL: "https://identitycache-dev.energyweb.org/"
+  ASSET_CACHE_SERVER_URL: "https://identitycache-dev.energyweb.org/"
+  NATS_SERVER_URL: "identityevents-dev-nats.energyweb.org"
+  NATS_PROTOCOL_PORT: "4222"
+
+  EV_REGISTRY_PROVIDER: "https://volta-internal-archive.energyweb.org"
 
 jobs:
 
@@ -97,10 +109,46 @@ jobs:
           echo IMAGE_TAG=${{ env.IMAGE_TAG }}>> .env;
           echo AWS_ACCOUNT_ID_STAGING=${{ secrets.AWS_ACCOUNT_ID_STAGING }} >> .env;
           echo AWS_REPOSITORY_URL=${{ secrets.AWS_REPOSITORY_URL }} >> .env;
+
           echo OCN_IDENTITY=${{ secrets.CPO_PRIVATE_KEY }} > .env_cpo;
           echo OCN_TOKEN_A=${{ secrets.CPO_TOKEN_A }} >> .env_cpo;
+          echo OCN_NODE_URL=${{ env.OCN_NODE_URL }} >> .env_cpo;
+          echo OCN_STAGE=${{ env.OCN_STAGE }} >> .env_cpo;
+          echo CPO_PORT=${{ env.CPO_PORT }} >> .env_cpo;
+          echo CPO_PUBLIC_IP=${{ secrets.CPO_PUBLIC_IP }} >> .env_cpo;
+          echo CPO_PARTY_ID=${{ secrets.CPO_PARTY_ID }} >> .env_cpo;
+          echo CPO_COUNTRY_CODE=${{ secrets.CPO_COUNTRY_CODE }} >> .env_cpo;
+          echo CPO_ASSET_CREATION_DELAY=${{ env.CPO_ASSET_CREATION_DELAY }} >> .env_cpo;
+          echo PREQUALIFICATION_ISSUER_ROLE=${{ env.PREQUALIFICATION_ISSUER_ROLE }} >> .env_cpo;
+          echo PREQUALIFICATION_ROLE=${{ env.PREQUALIFICATION_ROLE }} >> .env_cpo;
+          echo EWC_RPC_URL=${{ env.EWC_RPC_URL }} >> .env_cpo;
+          echo USER_CACHE_SERVER_URL=${{ env.USER_CACHE_SERVER_URL }} >> .env_cpo;
+          echo ASSET_CACHE_SERVER_URL=${{ env.ASSET_CACHE_SERVER_URL }} >> .env_cpo;
+          echo NATS_SERVER_URL=${{ env.NATS_SERVER_URL }} >> .env_cpo;
+          echo NATS_PROTOCOL_PORT=${{ env.NATS_PROTOCOL_PORT }} >> .env_cpo;
+          echo EV_REGISTRY_ADDRESS=${{ secrets.EV_REGISTRY_ADDRESS }} >> .env_cpo;
+          echo EV_REGISTRY_PROVIDER=${{ env.EV_REGISTRY_PROVIDER }} >> .env_cpo;
+
+
           echo OCN_IDENTITY=${{ secrets.MSP_PRIVATE_KEY }} > .env_msp;
           echo OCN_TOKEN_A=${{ secrets.MSP_TOKEN_A }} >> .env_msp;
+          echo OCN_NODE_URL=${{ env.OCN_NODE_URL }} >> .env_msp;
+          echo OCN_STAGE=${{ env.OCN_STAGE }} >> .env_msp;
+          echo MSP_PORT=${{ env.MSP_PORT }} >> .env_msp;
+          echo MSP_PUBLIC_IP=${{ secrets.MSP_PUBLIC_IP }} >> .env_msp;
+          echo MSP_PARTY_ID=${{ secrets.MSP_PARTY_ID }} >> .env_msp;
+          echo MSP_COUNTRY_CODE=${{ secrets.MSP_COUNTRY_CODE }} >> .env_msp;
+          echo MSP_ASSET_CREATION_DELAY=${{ env.MSP_ASSET_CREATION_DELAY }} >> .env_msp;
+          echo PREQUALIFICATION_ISSUER_ROLE=${{ env.PREQUALIFICATION_ISSUER_ROLE }} >> .env_msp;
+          echo PREQUALIFICATION_ROLE=${{ env.PREQUALIFICATION_ROLE }} >> .env_msp;
+          echo EWC_RPC_URL=${{ env.EWC_RPC_URL }} >> .env_msp;
+          echo USER_CACHE_SERVER_URL=${{ env.USER_CACHE_SERVER_URL }} >> .env_msp;
+          echo ASSET_CACHE_SERVER_URL=${{ env.ASSET_CACHE_SERVER_URL }} >> .env_msp;
+          echo NATS_SERVER_URL=${{ env.NATS_SERVER_URL }} >> .env_msp;
+          echo NATS_PROTOCOL_PORT=${{ env.NATS_PROTOCOL_PORT }} >> .env_msp;
+          echo EV_REGISTRY_ADDRESS=${{ secrets.EV_REGISTRY_ADDRESS }} >> .env_msp;
+          echo EV_REGISTRY_PROVIDER=${{ env.EV_REGISTRY_PROVIDER }} >> .env_msp;
+
           echo ${{ secrets.NGINX_CERTIFICATE }} | base64 -d > ./devops/nginx/origin.crt;
           echo ${{ secrets.NGINX_KEY }} | base64 -d > ./devops/nginx/origin.key;
           aws ecr get-login --no-include-email --region eu-central-1 | bash;
