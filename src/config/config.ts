@@ -18,60 +18,60 @@ import { IOcnToolsConfig } from "../types"
 
 export const config: IOcnToolsConfig = {
     ocn: {
-        node: "https://test-ocn.emobilify.com",
-        stage: "volta"
+        node: process.env.OCN_NODE_URL || "https://test-ocn.emobilify.com",
+        stage: process.env.OCN_STAGE  || "volta"
     },
     cpo: {
-        port: 3000,
-        publicIP: "https://dev-ev-dashboard-cpo.energyweb.org",
+        port: parseInt(process.env.CPO_PORT || "3000", 10),
+        publicIP: process.env.CPO_PUBLIC_IP || "https://dev-ev-dashboard-cpo.energyweb.org",
         roles: [
             {
-                party_id: "KZA",
-                country_code: "PL",
+                party_id: process.env.CPO_PARTY_ID || "KZA",
+                country_code: process.env.CPO_COUNTRY_CODE || "PL",
                 role: "CPO",
                 business_details: {
-                    name: `Test CPO ${uuid.v4()}`
+                    name: process.env.CPO_NAME || `Test CPO ${uuid.v4()}`
                 }
             }
         ],
         services: [],
-        assetCreationDelayMS: 10000,
+        assetCreationDelayMS: parseInt(process.env.CPO_ASSET_CREATION_DELAY || "10000", 10),
         createAssetDIDs: false
     },
     msp: {
-        port: 3001,
-        publicIP: "https://dev-ev-dashboard-msp.energyweb.org",
+        port: parseInt(process.env.MSP_PORT || "3001", 10),
+        publicIP: process.env.MSP_PUBLIC_IP || "https://dev-ev-dashboard-msp.energyweb.org",
         roles: [
             {
-                party_id: "KZB",
-                country_code: "PL",
+                party_id: process.env.MSP_PARTY_ID || "KZB",
+                country_code: process.env.MSP_COUNTRY_CODE || "PL",
                 role: "EMSP",
                 business_details: {
-                    name: `Test MSP ${uuid.v4()}`
+                    name: process.env.MSP_NAME || `Test MSP ${uuid.v4()}`
                 }
             }
         ],
         services: [],
         createAssetDIDs: false,
-        assetCreationDelayMS: 10000,
-        assetCount: 200
+        assetCreationDelayMS: parseInt(process.env.MSP_ASSET_CREATION_DELAY || "10000", 10),
+        assetCount: parseInt(process.env.MSP_ASSET_COUNT || "200", 10),
     },
     prequalification: {
-        prequalificationIssuerRole: "tso.roles.evdashboard.apps.elia.iam.ewc",
-        prequalifcationRole: "prequalified.roles.flexmarket.apps.elia.iam.ewc",
-        provider: "https://volta-internal-archive.energyweb.org",
+        prequalificationIssuerRole: process.env.PREQUALIFICATION_ISSUER_ROLE ?? "tso.roles.evdashboard.apps.elia.iam.ewc",
+        prequalifcationRole: process.env.PREQUALIFICATION_ROLE ?? "prequalified.roles.flexmarket.apps.elia.iam.ewc",
+        provider: process.env.EWC_RPC_URL ?? "https://volta-internal-archive.energyweb.org",
         chainId: 73799,
         user_claims_iam: {
-            cacheServerUrl: "https://identitycache-dev.energyweb.org/",
+            cacheServerUrl: process.env.USER_CACHE_SERVER_URL ?? "https://identitycache-dev.energyweb.org/",
         },
         asset_claims_iam: {
-            cacheServerUrl: "https://identitycache-dev.energyweb.org/",
-            natsServerUrl: "identityevents-dev-nats.energyweb.org",
-            natsProtocolPort: "4222",
+            cacheServerUrl: process.env.ASSET_CACHE_SERVER_URL ?? "https://identitycache-dev.energyweb.org/",
+            natsServerUrl: process.env.NATS_SERVER_URL ?? "identityevents-dev-nats.energyweb.org",
+            natsProtocolPort: process.env.NATS_PROTOCOL_PORT ?? "4222",
         }
     },
     evRegistry: {
-        address: "0x8d80504617eB17816b91610Fb2a0274Dc70f193f",
-        provider: "https://volta-internal-archive.energyweb.org"
+        address: process.env.EV_REGISTRY_ADDRESS || "0x8d80504617eB17816b91610Fb2a0274Dc70f193f",
+        provider: process.env.EV_REGISTRY_PROVIDER || "https://volta-internal-archive.energyweb.org"
     }
 }
