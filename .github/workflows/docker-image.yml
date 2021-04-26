@@ -16,15 +16,7 @@ env:
   MSP_ASSET_CREATION_DELAY: "10000"
   MSP_ASSET_COUNT: "200"
 
-  PREQUALIFICATION_ISSUER_ROLE: "tso.roles.evdashboard.apps.elia.iam.ewc"
-  PREQUALIFICATION_ROLE: "prequalified.roles.flexmarket.apps.elia.iam.ewc"
-  EWC_RPC_URL: "https://volta-internal-archive.energyweb.org"
-  USER_CACHE_SERVER_URL: "https://identitycache-dev.energyweb.org/"
-  ASSET_CACHE_SERVER_URL: "https://identitycache-dev.energyweb.org/"
-  NATS_SERVER_URL: "identityevents-dev-nats.energyweb.org"
   NATS_PROTOCOL_PORT: "4222"
-
-  EV_REGISTRY_PROVIDER: "https://volta-internal-archive.energyweb.org"
 
 jobs:
 
@@ -119,15 +111,15 @@ jobs:
           echo CPO_PARTY_ID=${{ secrets.CPO_PARTY_ID }} >> .env_cpo;
           echo CPO_COUNTRY_CODE=${{ secrets.CPO_COUNTRY_CODE }} >> .env_cpo;
           echo CPO_ASSET_CREATION_DELAY=${{ env.CPO_ASSET_CREATION_DELAY }} >> .env_cpo;
-          echo PREQUALIFICATION_ISSUER_ROLE=${{ env.PREQUALIFICATION_ISSUER_ROLE }} >> .env_cpo;
-          echo PREQUALIFICATION_ROLE=${{ env.PREQUALIFICATION_ROLE }} >> .env_cpo;
-          echo EWC_RPC_URL=${{ env.EWC_RPC_URL }} >> .env_cpo;
-          echo USER_CACHE_SERVER_URL=${{ env.USER_CACHE_SERVER_URL }} >> .env_cpo;
-          echo ASSET_CACHE_SERVER_URL=${{ env.ASSET_CACHE_SERVER_URL }} >> .env_cpo;
-          echo NATS_SERVER_URL=${{ env.NATS_SERVER_URL }} >> .env_cpo;
+          echo PREQUALIFICATION_ISSUER_ROLE=${{ secrets.PREQUALIFICATION_ISSUER_ROLE }} >> .env_cpo;
+          echo PREQUALIFICATION_ROLE=${{ secrets.PREQUALIFICATION_ROLE }} >> .env_cpo;
+          echo EWC_RPC_URL=${{ secrets.EWC_RPC_URL }} >> .env_cpo;
+          echo USER_CACHE_SERVER_URL=${{ secrets.USER_CACHE_SERVER_URL }} >> .env_cpo;
+          echo ASSET_CACHE_SERVER_URL=${{ secrets.ASSET_CACHE_SERVER_URL }} >> .env_cpo;
+          echo NATS_SERVER_URL=${{ secrets.NATS_SERVER_URL }} >> .env_cpo;
           echo NATS_PROTOCOL_PORT=${{ env.NATS_PROTOCOL_PORT }} >> .env_cpo;
           echo EV_REGISTRY_ADDRESS=${{ secrets.EV_REGISTRY_ADDRESS }} >> .env_cpo;
-          echo EV_REGISTRY_PROVIDER=${{ env.EV_REGISTRY_PROVIDER }} >> .env_cpo;
+          echo EV_REGISTRY_PROVIDER=${{ secrets.EV_REGISTRY_PROVIDER }} >> .env_cpo;
 
 
           echo OCN_IDENTITY=${{ secrets.MSP_PRIVATE_KEY }} > .env_msp;
@@ -139,15 +131,15 @@ jobs:
           echo MSP_PARTY_ID=${{ secrets.MSP_PARTY_ID }} >> .env_msp;
           echo MSP_COUNTRY_CODE=${{ secrets.MSP_COUNTRY_CODE }} >> .env_msp;
           echo MSP_ASSET_CREATION_DELAY=${{ env.MSP_ASSET_CREATION_DELAY }} >> .env_msp;
-          echo PREQUALIFICATION_ISSUER_ROLE=${{ env.PREQUALIFICATION_ISSUER_ROLE }} >> .env_msp;
-          echo PREQUALIFICATION_ROLE=${{ env.PREQUALIFICATION_ROLE }} >> .env_msp;
-          echo EWC_RPC_URL=${{ env.EWC_RPC_URL }} >> .env_msp;
-          echo USER_CACHE_SERVER_URL=${{ env.USER_CACHE_SERVER_URL }} >> .env_msp;
-          echo ASSET_CACHE_SERVER_URL=${{ env.ASSET_CACHE_SERVER_URL }} >> .env_msp;
-          echo NATS_SERVER_URL=${{ env.NATS_SERVER_URL }} >> .env_msp;
+          echo PREQUALIFICATION_ISSUER_ROLE=${{ secrets.PREQUALIFICATION_ISSUER_ROLE }} >> .env_msp;
+          echo PREQUALIFICATION_ROLE=${{ secrets.PREQUALIFICATION_ROLE }} >> .env_msp;
+          echo EWC_RPC_URL=${{ secrets.EWC_RPC_URL }} >> .env_msp;
+          echo USER_CACHE_SERVER_URL=${{ secrets.USER_CACHE_SERVER_URL }} >> .env_msp;
+          echo ASSET_CACHE_SERVER_URL=${{ secrets.ASSET_CACHE_SERVER_URL }} >> .env_msp;
+          echo NATS_SERVER_URL=${{ secrets.NATS_SERVER_URL }} >> .env_msp;
           echo NATS_PROTOCOL_PORT=${{ env.NATS_PROTOCOL_PORT }} >> .env_msp;
           echo EV_REGISTRY_ADDRESS=${{ secrets.EV_REGISTRY_ADDRESS }} >> .env_msp;
-          echo EV_REGISTRY_PROVIDER=${{ env.EV_REGISTRY_PROVIDER }} >> .env_msp;
+          echo EV_REGISTRY_PROVIDER=${{ secrets.EV_REGISTRY_PROVIDER }} >> .env_msp;
 
           echo ${{ secrets.NGINX_CERTIFICATE }} | base64 -d > ./devops/nginx/origin.crt;
           echo ${{ secrets.NGINX_KEY }} | base64 -d > ./devops/nginx/origin.key;
