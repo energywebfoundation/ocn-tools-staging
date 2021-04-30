@@ -92,6 +92,7 @@ jobs:
 
         working-directory: /home/ubuntu/docker-stack/${{ github.event.repository.name }}
         command: >-
+          git stash;
           sudo git pull;
           touch .env;
           touch ./devops/nginx/origin.crt;
@@ -132,7 +133,8 @@ jobs:
           echo MSP_COUNTRY_CODE=${{ secrets.MSP_COUNTRY_CODE }} >> .env_msp;
           echo MSP_ASSET_CREATION_DELAY=${{ env.MSP_ASSET_CREATION_DELAY }} >> .env_msp;
           echo PREQUALIFICATION_ISSUER_ROLE=${{ secrets.PREQUALIFICATION_ISSUER_ROLE }} >> .env_msp;
-          echo PREQUALIFICATION_ROLE=${{ secrets.PREQUALIFICATION_ROLE }} >> .env_msp;
+          echo PREQUALIFICATION_ROLE=${{ secrets.PREQUALIFICATION_ROLE }} >> .env_msp;?
+          
           echo EWC_RPC_URL=${{ secrets.EWC_RPC_URL }} >> .env_msp;
           echo USER_CACHE_SERVER_URL=${{ secrets.USER_CACHE_SERVER_URL }} >> .env_msp;
           echo ASSET_CACHE_SERVER_URL=${{ secrets.ASSET_CACHE_SERVER_URL }} >> .env_msp;
